@@ -275,7 +275,9 @@ define([
 
     ConnectionRouteManager3.prototype.redrawConnections = function (ids) {
 
-        this.simpleRouter.redrawConnections(ids);
+        if (ids.length > 0 && this.diagramDesigner.contextChanged === true) {
+            this.simpleRouter.redrawConnections(ids);
+        }
 
         if (!this._initialized) {
             this._initializeGraph();

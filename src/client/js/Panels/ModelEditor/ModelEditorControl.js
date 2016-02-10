@@ -158,7 +158,11 @@ define(['js/logger',
                 self._eventCallback(events);
             });
             //update the territory
+            this.designerCanvas.contextChanged = true;
             this._client.updateTerritory(this._territoryId, this._selfPatterns);
+            setTimeout(function () {
+                self.designerCanvas.contextChanged = false;
+            }, 500);
         } else {
             this.designerCanvas.setBackgroundText('No object to display', {
                 color: BACKGROUND_TEXT_COLOR,

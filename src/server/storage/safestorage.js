@@ -1325,4 +1325,42 @@ SafeStorage.prototype.loadPaths = function (data, callback) {
 };
 
 
+/**
+ * Lists all projects in the data-store (the returned results do not have to have metadata stored in _projects).
+ *
+ * Authorization level: siteAdmin
+ * @param {object} data - input parameters.
+ * @param {string} [data.username=gmeConfig.authentication.guestAccount]
+ * @param {function} [callback]
+ * @returns {promise}
+ */
+SafeStorage.prototype.listProjects = function (data, callback) {
+    var deferred = Q.defer(),
+        self = this,
+        rejected = false;
+
+    rejected = check(data !== null && typeof data === 'object', deferred, 'data is not an object.');
+
+    if (data.hasOwnProperty('username')) {
+        rejected = rejected || check(typeof data.username === 'string', deferred, 'data.username is not a string.');
+    } else {
+        data.username = this.gmeConfig.authentication.guestAccount;
+    }
+
+    if (rejected === false) {
+        this.gmeAuth.getUser(data.username)
+            .then(function (userdata) {
+                if (userdata.siteAdmin !== true) {
+                    throw new Error('Not authorized to list projects!');
+                }
+
+                return Storage.prototype.listProjects.call(self);
+            })
+            .then(deferred.resolve)
+            .catch(deferred.reject);
+    }
+
+    return deferred.promise.nodeify(callback);
+};
+
 module.exports = SafeStorage;

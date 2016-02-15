@@ -764,4 +764,8 @@ Storage.prototype.openProject = function (data, callback) {
     return this.database.openProject(data.projectId).nodeify(callback);
 };
 
+Storage.prototype.listProjects = function (callback) {
+    return this.database.listProjects().nodeify(callback);
+};
+
 module.exports = Storage;

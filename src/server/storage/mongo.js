@@ -379,6 +379,31 @@ function Mongo(mainLogger, gmeConfig) {
         return disconnectDeferred.promise.nodeify(callback);
     }
 
+    function listProjects(callback) {
+        var deferred = Q.defer();
+
+        if (self.client) {
+            Q.ninvoke(self.client, 'collectionNames')
+                .then(function (collectionNames) {
+                    var result = [],
+                        i;
+
+                    for (i = 0; i < collectionNames.length; i += 1) {
+                        if (REGEXP.PROJECT.test(collectionNames[i].name)) {
+                            result.push(collectionNames[i].name);
+                        }
+                    }
+
+                    deferred.resolve(result);
+                })
+                .catch(deferred.reject);
+        } else {
+            deferred.reject(new Error('Database is not open.'));
+        }
+
+        return deferred.promise.nodeify(callback);
+    }
+
     function deleteProject(projectId, callback) {
         var deferred = Q.defer();
 
@@ -503,12 +528,14 @@ function Mongo(mainLogger, gmeConfig) {
             })
             .then(function () {
                 return newProject;
-            });
+            })
+            .nodeify(callback);
     }
 
     this.openDatabase = openDatabase;
     this.closeDatabase = closeDatabase;
 
+    this.listProjects = listProjects;
     this.openProject = openProject;
     this.deleteProject = deleteProject;
     this.createProject = createProject;

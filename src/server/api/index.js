@@ -299,6 +299,19 @@ function createAPI(app, mountPath, middlewareOpts) {
             });
     });
 
+    router.get('/listAllProjects', function (req, res, next) {
+        //TODO: Decide on a better route..
+        var userId = getUserId(req);
+        safeStorage.listProjects({username: userId})
+            .then(function (projectIds) {
+                res.json(projectIds);
+            })
+            .catch(function (err) {
+                logger.error(err);
+                next(err);
+            });
+    });
+
     router.get('/componentSettings/:componentId', function (req, res, next) {
         var componentsPath = path.join(process.cwd(), 'config', 'components.json');
         logger.debug('Reading in default componentSettings at:', componentsPath);

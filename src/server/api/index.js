@@ -963,7 +963,7 @@ function createAPI(app, mountPath, middlewareOpts) {
 
     router.get('/projects', ensureAuthenticated, function (req, res, next) {
         var userId = getUserId(req);
-        safeStorage.getProjects({username: userId})
+        safeStorage.getProjects({username: userId, info: true})
             .then(function (result) {
                 res.json(result);
             })
